@@ -6,7 +6,6 @@ namespace iff_reader
     class Reader
     {
         readonly string _filePath;
-        Chunk _chunk;
 
         public Reader(string filePath)
         {
@@ -17,27 +16,33 @@ namespace iff_reader
         {
             using FileStream fs = File.OpenRead(_filePath);
             using BinaryReader br = new(fs);
+            Chunk chunk = new(br);
+            bool rootRead = false;
 
-            _chunk = new(br);
+            chunk.GetNextChunk();                                                 
+            chunk.GetFileSize();                                              
 
-            _chunk.GetForm();
-            _chunk.GetFileSize();
-            _chunk.GetRoot();
-            _chunk.GetForm();
-            _chunk.GetFormSize();
-            _chunk.GetForm();
-            
-            int formSize = _chunk.GetFormSize();
+            while (chunk.bytesUntilEndOfFile > 0)
+            {
+                if (!rootRead)
+                {
+                    chunk.GetRoot();                                         
+                    rootRead = true;
+                }
+                
+                string data = chunk.GetNextChunk();
 
-
-
-
-            // Need check to ensure not end of stream
-            // While bytesLeft > 1
-
-
-
-            Console.WriteLine();
+                if (data != "FORM")
+                {
+                    int chunkSize = chunk.GetChunkSize();
+                    chunk.GetChunkData(chunkSize);
+                }
+                else
+                {
+                    chunk.GetChunkSize();
+                    chunk.GetChunkName();
+                }
+            }
         }
     }
 }
