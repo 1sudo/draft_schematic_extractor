@@ -200,24 +200,17 @@ namespace iff_reader
                 }
             }
 
-            if (chunkType == "value")
+            if (chunkType == "76616C7565000320")
             {
                 if (data.Contains(chunkType))
                 {
-                    string data2 = data.Split("value")[1];
+                    data = data.Split(chunkType)[1];
 
-                    string value1 = $"{data2[3]}{data2[4]}{data2[5]}{data2[6]}";
-                    string value2 = $"{data2[7]}{data2[8]}{data2[9]}{data2[10]}";
+                    byte[] v1 = Utils.StringToByteArrayFastest($"{data[0]}{data[1]}{data[2]}{data[3]}{data[4]}{data[5]}{data[6]}{data[7]}");
+                    byte[] v2 = Utils.StringToByteArrayFastest($"{data[8]}{data[9]}{data[10]}{data[11]}{data[12]}{data[13]}{data[14]}{data[15]}");
 
-                    /*Console.WriteLine($"Hex value: {BitConverter.ToString(Encoding.ASCII.GetBytes(data2)).Replace("-", " ")}");
-                    Console.WriteLine($"Hex value 1: {BitConverter.ToString(Encoding.ASCII.GetBytes(value1)).Replace("-", " ")}");
-                    Console.WriteLine($"Hex value 2: {BitConverter.ToString(Encoding.ASCII.GetBytes(value2)).Replace("-", " ")}");*/
-
-                    int min = Utils.StringToDecimal2(value1);
-                    int max = Utils.StringToDecimal2(value2);
-
-                    minValues.Add(min);
-                    maxValues.Add(max);
+                    minValues.Add(BitConverter.ToInt32(v1, 0));
+                    maxValues.Add(BitConverter.ToInt32(v2, 0));
                 }
             }
 
@@ -255,14 +248,15 @@ namespace iff_reader
                 bytesUntilEndOfFile -= 1;
             }
 
+            string hexData = BitConverter.ToString(data.ToArray()).Replace("-", "");
             string stringData = Encoding.ASCII.GetString(data.ToArray());
 
             CheckChunkFor("slots", stringData);
             CheckChunkFor("attributes", stringData);
             CheckChunkFor("name", stringData);
             CheckChunkFor("experiment", stringData);
-            CheckChunkFor("value", stringData);
             CheckChunkFor("craftedSharedTemplate", stringData);
+            CheckChunkFor("76616C7565000320", hexData); // "value"
         }
 
         internal void FinishProcessing()
