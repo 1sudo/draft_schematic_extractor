@@ -9,27 +9,36 @@ namespace iff_reader
     {
         readonly BinaryReader _br;
         internal int? bytesUntilEndOfFile;
+        Program _program;
+        IFFFile _iffFile;
+        List<string> chunks;
+        List<string> ingredientTemplateNames;
+        List<string> ingredientTitleNames;
+        List<string> experimentalSubGroupTitles;
+        List<string> experimentalGroupTitles;
+        List<int> minValues;
+        List<int> maxValues;
 
-        internal static Action<string> OnNextChunk;
-        internal static Action<int> OnFileSize;
-        internal static Action<int> OnSlots;
-        internal static Action<int> OnAttributes;
-        internal static Action<string> OnIngredientTemplateName;
-        internal static Action<string> OnIngredientTitleName;
-        internal static Action<string> OnExperimentalSubGroupTitle;
-        internal static Action<string> OnExperimentalGroupTitle;
-        internal static Action<int> OnMinValue;
-        internal static Action<int> OnMaxValue;
-
-        internal Chunk(BinaryReader br)
+        internal Chunk(BinaryReader br, IFFFile iffFile)
         {
             _br = br;
+            _program = new();
+            _iffFile = iffFile;
+
+            chunks = new();
+            ingredientTemplateNames = new();
+            ingredientTitleNames = new();
+            experimentalSubGroupTitles = new();
+            experimentalGroupTitles = new();
+            minValues = new();
+            maxValues = new();
         }
 
         internal string GetNextChunk()
         {
             if (bytesUntilEndOfFile is not null) bytesUntilEndOfFile -= 4;
             var value = _br.ReadBytes(4);
+            chunks.Add(Encoding.ASCII.GetString(value));
             return Encoding.ASCII.GetString(value);
         }
 
@@ -37,7 +46,7 @@ namespace iff_reader
         {
             var value = Utils.SwapEndianness(_br.ReadInt32());
             if (bytesUntilEndOfFile is null) bytesUntilEndOfFile = value;
-            OnFileSize?.Invoke(value);
+            _program.OnFileSize(value, _iffFile);
             return value;
         }
 
@@ -48,7 +57,7 @@ namespace iff_reader
             return value;
         }
 
-        internal static void CheckChunkFor(string chunkType, string data)
+        internal void CheckChunkFor(string chunkType, string data)
         {
             if (chunkType == "slots" || chunkType == "attributes")
             {
@@ -69,12 +78,12 @@ namespace iff_reader
                     if (chunkType == "slots")
                     {
                         int slots = Utils.StringToDecimal(sb.ToString().Substring(2, 4));
-                        OnSlots?.Invoke(slots);
+                        _program.OnSlots(slots, _iffFile);
                     }
                     if (chunkType == "attributes")
                     {
                         int attributes = Utils.StringToDecimal(sb.ToString().Substring(2, 4));
-                        OnAttributes?.Invoke(attributes);
+                        _program.OnAttributes(attributes, _iffFile);
                     }
                 }
             }
@@ -112,8 +121,8 @@ namespace iff_reader
                         }
                     }
 
-                    OnIngredientTemplateName?.Invoke(ingredientTemplateName);
-                    OnIngredientTitleName?.Invoke(ingredientTitleName);
+                    ingredientTemplateNames.Add(ingredientTemplateName);
+                    ingredientTitleNames.Add(ingredientTitleName);
                 }
 
                 if (data.Contains(chunkType) && data.Contains("crafting"))
@@ -146,7 +155,7 @@ namespace iff_reader
                         }
                     }
 
-                    OnExperimentalSubGroupTitle?.Invoke(experimentalSubGroupTitle);
+                    experimentalSubGroupTitles.Add(experimentalSubGroupTitle);
                 }
             }
 
@@ -182,7 +191,7 @@ namespace iff_reader
                         }
                     }
 
-                    OnExperimentalGroupTitle?.Invoke(experimentalGroupTitle);
+                    experimentalGroupTitles.Add(experimentalGroupTitle);
                 }
             }
 
@@ -202,8 +211,8 @@ namespace iff_reader
                     int min = Utils.StringToDecimal2(value1);
                     int max = Utils.StringToDecimal2(value2);
 
-                    OnMinValue?.Invoke(min);
-                    OnMaxValue?.Invoke(max);
+                    minValues.Add(min);
+                    maxValues.Add(max);
                 }
             }
 
@@ -229,6 +238,17 @@ namespace iff_reader
             CheckChunkFor("name", stringData);
             CheckChunkFor("experiment", stringData);
             CheckChunkFor("value", stringData);
+        }
+
+        internal void FinishProcessing()
+        {
+            _program.OnNextChunk(chunks, _iffFile);
+            _program.OnIngredientTemplateName(ingredientTemplateNames, _iffFile);
+            _program.OnIngredientTitleName(ingredientTitleNames, _iffFile);
+            _program.OnExperimentalSubGroupTitle(experimentalSubGroupTitles, _iffFile);
+            _program.OnExperimentalGroupTitle(experimentalGroupTitles, _iffFile);
+            _program.OnMinValue(minValues, _iffFile);
+            _program.OnMaxValue(maxValues, _iffFile);
         }
     }
 }

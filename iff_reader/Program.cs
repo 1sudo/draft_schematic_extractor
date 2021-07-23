@@ -1,5 +1,6 @@
 ﻿using Newtonsoft.Json;
 using System;
+using System.Collections.Generic;
 using System.IO;
 
 namespace iff_reader
@@ -8,81 +9,75 @@ namespace iff_reader
     {
         IFFFile iffFile;
 
+
         static void Main(string[] args)
         {
             Program program = new();
 
             program.Run();
-
-            Chunk.OnFileSize += program.OnFileSize;
-            Chunk.OnNextChunk += program.OnNextChunk;
-            Chunk.OnSlots += program.OnSlots;
-            Chunk.OnAttributes += program.OnAttributes;
-            Chunk.OnIngredientTemplateName += program.OnIngredientTemplateName;
-            Chunk.OnIngredientTitleName += program.OnIngredientTitleName;
-            Chunk.OnExperimentalSubGroupTitle += program.OnExperimentalSubGroupTitle;
-            Chunk.OnExperimentalGroupTitle += program.OnExperimentalGroupTitle;
-            Chunk.OnMinValue += program.OnMinValue;
-            Chunk.OnMaxValue += program.OnMaxValue;
         }
 
         void Run()
         {
             iffFile = new();
-            Reader reader = new("shared_sword_ryyk_blade.iff");
+
+            string fileName = "shared_sword_ryyk_blade.iff";
+            iffFile.FileName = fileName;
+
+            Reader reader = new(fileName, iffFile);
             reader.Read();
-            File.WriteAllText("test.json", JsonConvert.SerializeObject(iffFile));
+
+            File.WriteAllText("test.json", JsonConvert.SerializeObject(iffFile, Formatting.Indented));
         }
 
-        void OnFileSize(int fileSize)
+        internal void OnFileSize(int fileSize, IFFFile iffFile)
         {
-            Console.WriteLine("test");
             iffFile.FileSize = fileSize;
         }
 
-        void OnNextChunk(string chunkName)
+        internal void OnNextChunk(List<string> chunkNames, IFFFile iffFile)
         {
-            iffFile.NextChunk = chunkName;
+            iffFile.NextChunk = chunkNames;
         }
 
-        void OnSlots(int slots)
+        internal void OnSlots(int slots, IFFFile iffFile)
         {
             iffFile.Slots = slots;
         }
 
-        void OnAttributes(int attributes)
+        internal void OnAttributes(int attributes, IFFFile iffFile)
         {
             iffFile.Attributes = attributes;
         }
 
-        void OnIngredientTemplateName(string templateName)
+        internal void OnIngredientTemplateName(List<string> templateNames, IFFFile iffFile)
         {
-            iffFile.IngredientTemplateName = templateName;  
-        }
-        
-        void OnIngredientTitleName(string titleName)
-        {
-            iffFile.IngredientTitleName = titleName;
+            iffFile.IngredientTemplateName = templateNames;
         }
 
-        void OnExperimentalSubGroupTitle(string subGroupTitle)
+        internal void OnIngredientTitleName(List<string> titleNames, IFFFile iffFile)
         {
-            iffFile.ExperimentalSubGroupTitle = subGroupTitle;
+            iffFile.IngredientTitleName = titleNames;
         }
 
-        void OnExperimentalGroupTitle(string groupTitle)
+        internal void OnExperimentalSubGroupTitle(List<string> subGroupTitles, IFFFile iffFile)
         {
-            iffFile.ExperimentalGroupTitle = groupTitle;
+            iffFile.ExperimentalSubGroupTitle = subGroupTitles;
         }
 
-        void OnMinValue(int minValue)
+        internal void OnExperimentalGroupTitle(List<string> groupTitles, IFFFile iffFile)
         {
-            iffFile.MinValue = minValue;
+            iffFile.ExperimentalGroupTitle = groupTitles;
         }
 
-        void OnMaxValue(int maxValue)
+        internal void OnMinValue(List<int> minValues, IFFFile iffFile)
         {
-            iffFile.MaxValue = maxValue;
+            iffFile.MinValue = minValues;
+        }
+
+        internal void OnMaxValue(List<int> maxValues, IFFFile iffFile)
+        {
+            iffFile.MaxValue = maxValues;
         }
     }
 }

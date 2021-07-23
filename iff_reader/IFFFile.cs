@@ -1,17 +1,19 @@
-﻿namespace iff_reader
+﻿using System.Collections.Generic;
+
+namespace iff_reader
 {
-    internal class IFFFile
+    public class IFFFile
     {
-        internal string FileName { get; set; }
-        internal int FileSize { get; set; }
-        internal string NextChunk {  get; set; }
-        internal int Slots { get; set; }
-        internal int Attributes { get; set; }
-        internal string IngredientTemplateName { get; set; }
-        internal string IngredientTitleName { get; set; }
-        internal string ExperimentalSubGroupTitle { get; set; }
-        internal string ExperimentalGroupTitle { get; set; }
-        internal int MinValue { get; set; }
-        internal int MaxValue { get; set; }
+        public string FileName { get; set; }
+        public int FileSize { get; set; }
+        public List<string> NextChunk {  get; set; }
+        public int Slots { get; set; }
+        public int Attributes { get; set; }
+        public List<string> IngredientTemplateName { get; set; }
+        public List<string> IngredientTitleName { get; set; }
+        public List<string> ExperimentalSubGroupTitle { get; set; }
+        public List<string> ExperimentalGroupTitle { get; set; }
+        public List<int> MinValue { get; set; }
+        public List<int> MaxValue { get; set; }
     }
 }
