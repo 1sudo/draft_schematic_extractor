@@ -38,7 +38,7 @@ namespace iff_reader
         {
             if (bytesUntilEndOfFile is not null) bytesUntilEndOfFile -= 4;
             var value = _br.ReadBytes(4);
-            chunks.Add(Encoding.ASCII.GetString(value));
+            // chunks.Add(Encoding.ASCII.GetString(value));
             return Encoding.ASCII.GetString(value);
         }
 
@@ -161,7 +161,7 @@ namespace iff_reader
 
             if (chunkType == "experiment")
             {
-                if (data.Contains(chunkType) && data.Contains("crafting"))
+                if (data.Contains(chunkType))
                 {
                     bool badChar = true;
                     StringBuilder sb = new();
@@ -191,6 +191,11 @@ namespace iff_reader
                         }
                     }
 
+                    if (string.IsNullOrEmpty(experimentalGroupTitle))
+                    {
+                        experimentalGroupTitle = "null";
+                    }
+
                     experimentalGroupTitles.Add(experimentalGroupTitle);
                 }
             }
@@ -216,6 +221,25 @@ namespace iff_reader
                 }
             }
 
+            if (chunkType == "craftedSharedTemplate")
+            {
+                if (data.Contains(chunkType))
+                {
+                    string data2 = data.Split("craftedSharedTemplate")[1];
+                    StringBuilder sb = new();
+
+                    foreach (char c in data2)
+                    {
+                        if (char.IsLetter(c) || c == '/' || c == '_' || c == '.')
+                        {
+                            sb.Append(c);
+                        }
+                    }
+
+                    _program.OnCraftedSharedTemplate(sb.ToString(), _iffFile);
+                }
+            }
+
             // TO DO:
             // craftedSharedTemplate
 
@@ -238,11 +262,12 @@ namespace iff_reader
             CheckChunkFor("name", stringData);
             CheckChunkFor("experiment", stringData);
             CheckChunkFor("value", stringData);
+            CheckChunkFor("craftedSharedTemplate", stringData);
         }
 
         internal void FinishProcessing()
         {
-            _program.OnNextChunk(chunks, _iffFile);
+            // _program.OnNextChunk(chunks, _iffFile);
             _program.OnIngredientTemplateName(ingredientTemplateNames, _iffFile);
             _program.OnIngredientTitleName(ingredientTitleNames, _iffFile);
             _program.OnExperimentalSubGroupTitle(experimentalSubGroupTitles, _iffFile);

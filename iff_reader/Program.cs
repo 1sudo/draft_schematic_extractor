@@ -1,5 +1,4 @@
 ﻿using Newtonsoft.Json;
-using System;
 using System.Collections.Generic;
 using System.IO;
 
@@ -8,7 +7,6 @@ namespace iff_reader
     class Program
     {
         IFFFile iffFile;
-
 
         static void Main(string[] args)
         {
@@ -37,7 +35,7 @@ namespace iff_reader
 
         internal void OnNextChunk(List<string> chunkNames, IFFFile iffFile)
         {
-            iffFile.NextChunk = chunkNames;
+            // iffFile.NextChunk = chunkNames;
         }
 
         internal void OnSlots(int slots, IFFFile iffFile)
@@ -78,6 +76,11 @@ namespace iff_reader
         internal void OnMaxValue(List<int> maxValues, IFFFile iffFile)
         {
             iffFile.MaxValue = maxValues;
+        }
+
+        internal void OnCraftedSharedTemplate(string template, IFFFile iffFile)
+        {
+            iffFile.CraftedSharedTemplate = template;
         }
     }
 }

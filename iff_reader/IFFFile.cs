@@ -6,7 +6,7 @@ namespace iff_reader
     {
         public string FileName { get; set; }
         public int FileSize { get; set; }
-        public List<string> NextChunk {  get; set; }
+        // public List<string> NextChunk {  get; set; }
         public int Slots { get; set; }
         public int Attributes { get; set; }
         public List<string> IngredientTemplateName { get; set; }
@@ -15,5 +15,6 @@ namespace iff_reader
         public List<string> ExperimentalGroupTitle { get; set; }
         public List<int> MinValue { get; set; }
         public List<int> MaxValue { get; set; }
+        public string CraftedSharedTemplate { get; set; }
     }
 }
