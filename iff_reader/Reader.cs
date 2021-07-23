@@ -19,28 +19,26 @@ namespace iff_reader
             Chunk chunk = new(br);
             bool rootRead = false;
 
-            chunk.GetNextChunk();                                                 
-            chunk.GetFileSize();                                              
+            chunk.GetNextChunk();
+            chunk.GetFileSize();
 
             while (chunk.bytesUntilEndOfFile > 0)
             {
+                //Console.WriteLine($"Bytes left: {chunk.bytesUntilEndOfFile}");
                 if (!rootRead)
                 {
-                    chunk.GetRoot();                                         
+                    chunk.GetNextChunk();
                     rootRead = true;
                 }
-                
-                string data = chunk.GetNextChunk();
 
-                if (data != "FORM")
+                if (chunk.GetNextChunk() != "FORM")
                 {
-                    int chunkSize = chunk.GetChunkSize();
-                    chunk.GetChunkData(chunkSize);
+                    chunk.GetChunkData(chunk.GetChunkSize());
                 }
                 else
                 {
                     chunk.GetChunkSize();
-                    chunk.GetChunkName();
+                    chunk.GetNextChunk();
                 }
             }
         }
