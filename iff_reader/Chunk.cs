@@ -232,10 +232,6 @@ namespace iff_reader
                     _program.OnCraftedSharedTemplate(sb.ToString(), _iffFile);
                 }
             }
-
-            // TO DO:
-            // craftedSharedTemplate
-
         }
 
         internal void GetChunkData(int chunkSize)

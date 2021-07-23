@@ -1,4 +1,5 @@
 ﻿using Newtonsoft.Json;
+using System;
 using System.Collections.Generic;
 using System.IO;
 
@@ -19,13 +20,22 @@ namespace iff_reader
         {
             iffFile = new();
 
-            string fileName = "shared_sword_ryyk_blade.iff";
-            iffFile.FileName = fileName;
+            IEnumerable<string> files = Directory.EnumerateFiles("object/", "*.*", SearchOption.AllDirectories);
 
-            Reader reader = new(fileName, iffFile);
-            reader.Read();
+            foreach (string file in files)
+            {
+                iffFile.FileName = file.Replace("\\", "/");
 
-            File.WriteAllText("test.json", JsonConvert.SerializeObject(iffFile, Formatting.Indented));
+                Reader reader = new(file, iffFile);
+                reader.Read();
+
+                string outFile = Path.Join("output", file.Split(".iff")[0] + ".json");
+
+                FileInfo newFile = new FileInfo(outFile);
+                newFile.Directory.Create();
+
+                File.WriteAllText(outFile, JsonConvert.SerializeObject(iffFile, Formatting.Indented));
+            }
         }
 
         internal void OnFileSize(int fileSize, IFFFile iffFile)
