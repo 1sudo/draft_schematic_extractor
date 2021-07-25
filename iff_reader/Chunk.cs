@@ -9,15 +9,14 @@ namespace iff_reader
     {
         readonly BinaryReader _br;
         internal int? bytesUntilEndOfFile;
-        Program _program;
-        IFFFile _iffFile;
-        List<string> chunks;
-        List<string> ingredientTemplateNames;
-        List<string> ingredientTitleNames;
-        List<string> experimentalSubGroupTitles;
-        List<string> experimentalGroupTitles;
-        List<int> minValues;
-        List<int> maxValues;
+        readonly Program _program;
+        readonly IFFFile _iffFile;
+        readonly List<string> ingredientTemplateNames;
+        readonly List<string> ingredientTitleNames;
+        readonly List<string> experimentalSubGroupTitles;
+        readonly List<string> experimentalGroupTitles;
+        readonly List<int> minValues;
+        readonly List<int> maxValues;
         bool isXp = false;
         bool isComplexity = false;
 
@@ -27,7 +26,6 @@ namespace iff_reader
             _program = new();
             _iffFile = iffFile;
 
-            chunks = new();
             ingredientTemplateNames = new();
             ingredientTitleNames = new();
             experimentalSubGroupTitles = new();
@@ -74,8 +72,6 @@ namespace iff_reader
                             sb.Append(c);
                         }
                     }
-
-                    string nextChunk = Utils.Reverse(data.Split(sb.ToString())[1]);
 
                     if (chunkType == "slots")
                     {
