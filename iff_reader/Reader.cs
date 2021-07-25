@@ -6,7 +6,7 @@ namespace iff_reader
     class Reader
     {
         readonly string _filePath;
-        IFFFile _iffFile;
+        readonly IFFFile _iffFile;
 
         public Reader(string filePath, IFFFile iffFile)
         {
@@ -26,7 +26,6 @@ namespace iff_reader
 
             while (chunk.bytesUntilEndOfFile > 0)
             {
-                //Console.WriteLine($"Bytes left: {chunk.bytesUntilEndOfFile}");
                 if (!rootRead)
                 {
                     chunk.GetNextChunk();

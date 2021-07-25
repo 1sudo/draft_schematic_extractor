@@ -9,7 +9,6 @@ namespace iff_reader
     {
         readonly BinaryReader _br;
         internal int? bytesUntilEndOfFile;
-        readonly Program _program;
         readonly IFFFile _iffFile;
         readonly List<string> ingredientTemplateNames;
         readonly List<string> ingredientTitleNames;
@@ -23,7 +22,6 @@ namespace iff_reader
         internal Chunk(BinaryReader br, IFFFile iffFile)
         {
             _br = br;
-            _program = new();
             _iffFile = iffFile;
 
             ingredientTemplateNames = new();
@@ -46,7 +44,7 @@ namespace iff_reader
         {
             var value = Utils.SwapEndianness(_br.ReadInt32());
             if (bytesUntilEndOfFile is null) bytesUntilEndOfFile = value;
-            _program.OnFileSize(value, _iffFile);
+            Program.OnFileSize(value, _iffFile);
             return value;
         }
 
@@ -76,12 +74,12 @@ namespace iff_reader
                     if (chunkType == "slots")
                     {
                         int slots = Utils.StringToDecimal(sb.ToString().Substring(2, 4));
-                        _program.OnSlots(slots, _iffFile);
+                        Program.OnSlots(slots, _iffFile);
                     }
                     if (chunkType == "attributes")
                     {
                         int attributes = Utils.StringToDecimal(sb.ToString().Substring(2, 4));
-                        _program.OnAttributes(attributes, _iffFile);
+                        Program.OnAttributes(attributes, _iffFile);
                     }
                 }
             }
@@ -227,14 +225,14 @@ namespace iff_reader
                     {
                         minValues.Add(0);
                         maxValues.Add(0);
-                        _program.OnXp(BitConverter.ToInt32(v1, 0), _iffFile);
+                        Program.OnXp(BitConverter.ToInt32(v1, 0), _iffFile);
                         isXp = false;
                     }
                     else if (type == 1)
                     {
                         minValues.Add(0);
                         maxValues.Add(0);
-                        _program.OnComplexity(BitConverter.ToInt32(v1, 0), _iffFile);
+                        Program.OnComplexity(BitConverter.ToInt32(v1, 0), _iffFile);
                         isComplexity = false;
                     }
                     else
@@ -260,7 +258,7 @@ namespace iff_reader
                         }
                     }
 
-                    _program.OnCraftedSharedTemplate(sb.ToString(), _iffFile);
+                    Program.OnCraftedSharedTemplate(sb.ToString(), _iffFile);
                 }
             }
         }
@@ -302,12 +300,12 @@ namespace iff_reader
         internal void FinishProcessing()
         {
             // _program.OnNextChunk(chunks, _iffFile);
-            _program.OnIngredientTemplateName(ingredientTemplateNames, _iffFile);
-            _program.OnIngredientTitleName(ingredientTitleNames, _iffFile);
-            _program.OnExperimentalSubGroupTitle(experimentalSubGroupTitles, _iffFile);
-            _program.OnExperimentalGroupTitle(experimentalGroupTitles, _iffFile);
-            _program.OnMinValue(minValues, _iffFile);
-            _program.OnMaxValue(maxValues, _iffFile);
+            Program.OnIngredientTemplateName(ingredientTemplateNames, _iffFile);
+            Program.OnIngredientTitleName(ingredientTitleNames, _iffFile);
+            Program.OnExperimentalSubGroupTitle(experimentalSubGroupTitles, _iffFile);
+            Program.OnExperimentalGroupTitle(experimentalGroupTitles, _iffFile);
+            Program.OnMinValue(minValues, _iffFile);
+            Program.OnMaxValue(maxValues, _iffFile);
         }
     }
 }

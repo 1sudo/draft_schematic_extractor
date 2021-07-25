@@ -9,7 +9,7 @@ namespace iff_reader
     {
         IFFFile iffFile;
 
-        static void Main(string[] args)
+        static void Main()
         {
             Program program = new();
 
@@ -31,74 +31,69 @@ namespace iff_reader
 
                 string outFile = Path.Join("output", file.Split(".iff")[0] + ".json");
 
-                FileInfo newFile = new FileInfo(outFile);
+                FileInfo newFile = new(outFile);
                 newFile.Directory.Create();
 
                 File.WriteAllText(outFile, JsonConvert.SerializeObject(iffFile, Formatting.Indented));
             }
         }
 
-        internal void OnFileSize(int fileSize, IFFFile iffFile)
+        internal static void OnFileSize(int fileSize, IFFFile iffFile)
         {
             iffFile.FileSize = fileSize;
         }
 
-        internal void OnNextChunk(List<string> chunkNames, IFFFile iffFile)
-        {
-            // iffFile.NextChunk = chunkNames;
-        }
-
-        internal void OnSlots(int slots, IFFFile iffFile)
+        internal static void OnSlots(int slots, IFFFile iffFile)
         {
             iffFile.Slots = slots;
         }
 
-        internal void OnAttributes(int attributes, IFFFile iffFile)
+        internal static void OnAttributes(int attributes, IFFFile iffFile)
         {
             iffFile.Attributes = attributes;
         }
 
-        internal void OnIngredientTemplateName(List<string> templateNames, IFFFile iffFile)
+        internal static void OnIngredientTemplateName(List<string> templateNames, IFFFile iffFile)
         {
             iffFile.IngredientTemplateName = templateNames;
         }
 
-        internal void OnIngredientTitleName(List<string> titleNames, IFFFile iffFile)
+        internal static void OnIngredientTitleName(List<string> titleNames, IFFFile iffFile)
         {
             iffFile.IngredientTitleName = titleNames;
         }
 
-        internal void OnExperimentalSubGroupTitle(List<string> subGroupTitles, IFFFile iffFile)
+        internal static void OnExperimentalSubGroupTitle(List<string> subGroupTitles, IFFFile iffFile)
         {
             iffFile.ExperimentalSubGroupTitle = subGroupTitles;
         }
 
-        internal void OnExperimentalGroupTitle(List<string> groupTitles, IFFFile iffFile)
+        internal static void OnExperimentalGroupTitle(List<string> groupTitles, IFFFile iffFile)
         {
             iffFile.ExperimentalGroupTitle = groupTitles;
         }
 
-        internal void OnMinValue(List<int> minValues, IFFFile iffFile)
+        internal static void OnMinValue(List<int> minValues, IFFFile iffFile)
         {
             iffFile.MinValue = minValues;
         }
 
-        internal void OnMaxValue(List<int> maxValues, IFFFile iffFile)
+        internal static void OnMaxValue(List<int> maxValues, IFFFile iffFile)
         {
             iffFile.MaxValue = maxValues;
         }
 
-        internal void OnCraftedSharedTemplate(string template, IFFFile iffFile)
+        internal static void OnCraftedSharedTemplate(string template, IFFFile iffFile)
         {
             iffFile.CraftedSharedTemplate = template;
         }
 
-        internal void OnXp(int value, IFFFile iffFile)
+        internal static void OnXp(int value, IFFFile iffFile)
         {
             iffFile.Xp = value;
         }
 
-        internal void OnComplexity(int value, IFFFile iffFile)
+        internal static void OnComplexity(int value, IFFFile iffFile)
         {
             iffFile.Complexity = value;
         }
