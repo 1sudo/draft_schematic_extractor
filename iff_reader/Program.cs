@@ -92,5 +92,15 @@ namespace iff_reader
         {
             iffFile.CraftedSharedTemplate = template;
         }
+
+        internal void OnXp(int value, IFFFile iffFile)
+        {
+            iffFile.Xp = value;
+        }
+
+        internal void OnComplexity(int value, IFFFile iffFile)
+        {
+            iffFile.Complexity = value;
+        }
     }
 }

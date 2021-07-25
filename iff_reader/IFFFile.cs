@@ -9,6 +9,8 @@ namespace iff_reader
         // public List<string> NextChunk {  get; set; }
         public int Slots { get; set; }
         public int Attributes { get; set; }
+        public int Complexity { get; set; }
+        public int Xp { get; set; }
         public List<string> IngredientTemplateName { get; set; }
         public List<string> IngredientTitleName { get; set; }
         public List<string> ExperimentalSubGroupTitle { get; set; }

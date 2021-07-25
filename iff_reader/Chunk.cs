@@ -18,6 +18,8 @@ namespace iff_reader
         List<string> experimentalGroupTitles;
         List<int> minValues;
         List<int> maxValues;
+        bool isXp = false;
+        bool isComplexity = false;
 
         internal Chunk(BinaryReader br, IFFFile iffFile)
         {
@@ -57,7 +59,7 @@ namespace iff_reader
             return value;
         }
 
-        internal void CheckChunkFor(string chunkType, string data)
+        internal void CheckChunkFor(string chunkType, string data, int type = 2)
         {
             if (chunkType == "slots" || chunkType == "attributes")
             {
@@ -155,7 +157,18 @@ namespace iff_reader
                         }
                     }
 
-                    experimentalSubGroupTitles.Add(experimentalSubGroupTitle);
+                    if (experimentalSubGroupTitle == "xp")
+                    {
+                        isXp = true;
+                        experimentalSubGroupTitles.Add("null");
+                    }   
+                    else if (experimentalSubGroupTitle == "complexity")
+                    {
+                        isComplexity = true;
+                        experimentalSubGroupTitles.Add("null");
+                    }
+                    else 
+                        experimentalSubGroupTitles.Add(experimentalSubGroupTitle);
                 }
             }
 
@@ -196,7 +209,12 @@ namespace iff_reader
                         experimentalGroupTitle = "null";
                     }
 
-                    experimentalGroupTitles.Add(experimentalGroupTitle);
+                    if (type == 0)
+                        experimentalGroupTitles.Add("null");
+                    else if (type == 1)
+                        experimentalGroupTitles.Add("null");
+                    else
+                        experimentalGroupTitles.Add(experimentalGroupTitle);
                 }
             }
 
@@ -209,8 +227,25 @@ namespace iff_reader
                     byte[] v1 = Utils.StringToByteArrayFastest($"{data[0]}{data[1]}{data[2]}{data[3]}{data[4]}{data[5]}{data[6]}{data[7]}");
                     byte[] v2 = Utils.StringToByteArrayFastest($"{data[8]}{data[9]}{data[10]}{data[11]}{data[12]}{data[13]}{data[14]}{data[15]}");
 
-                    minValues.Add(BitConverter.ToInt32(v1, 0));
-                    maxValues.Add(BitConverter.ToInt32(v2, 0));
+                    if (type == 0)
+                    {
+                        minValues.Add(0);
+                        maxValues.Add(0);
+                        _program.OnXp(BitConverter.ToInt32(v1, 0), _iffFile);
+                        isXp = false;
+                    }
+                    else if (type == 1)
+                    {
+                        minValues.Add(0);
+                        maxValues.Add(0);
+                        _program.OnComplexity(BitConverter.ToInt32(v1, 0), _iffFile);
+                        isComplexity = false;
+                    }
+                    else
+                    {
+                        minValues.Add(BitConverter.ToInt32(v1, 0));
+                        maxValues.Add(BitConverter.ToInt32(v2, 0));
+                    }
                 }
             }
 
@@ -250,9 +285,22 @@ namespace iff_reader
             CheckChunkFor("slots", stringData);
             CheckChunkFor("attributes", stringData);
             CheckChunkFor("name", stringData);
-            CheckChunkFor("experiment", stringData);
+
+            if (isXp)
+                CheckChunkFor("experiment", stringData, 0);
+            else if (isComplexity)
+                CheckChunkFor("experiment", stringData, 1);
+            else
+                CheckChunkFor("experiment", stringData);
+
             CheckChunkFor("craftedSharedTemplate", stringData);
-            CheckChunkFor("76616C7565000320", hexData); // "value"
+
+            if (isXp)
+                CheckChunkFor("76616C7565000320", hexData, 0);
+            else if (isComplexity)
+                CheckChunkFor("76616C7565000320", hexData, 1);
+            else
+                CheckChunkFor("76616C7565000320", hexData);
         }
 
         internal void FinishProcessing()
